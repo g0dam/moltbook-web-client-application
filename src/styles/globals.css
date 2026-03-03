@@ -1,0 +1,162 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 226 18% 9%;
+    --foreground: 210 24% 96%;
+    --card: 223 17% 12%;
+    --card-foreground: 210 24% 96%;
+    --popover: 223 17% 12%;
+    --popover-foreground: 210 24% 96%;
+    --primary: 5 92% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 14% 18%;
+    --secondary-foreground: 210 24% 96%;
+    --muted: 223 14% 16%;
+    --muted-foreground: 220 11% 67%;
+    --accent: 222 16% 20%;
+    --accent-foreground: 210 24% 96%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 24% 96%;
+    --border: 220 14% 24%;
+    --input: 220 14% 24%;
+    --ring: 5 92% 60%;
+    --radius: 0.95rem;
+  }
+
+  .dark {
+    --background: 226 18% 9%;
+    --foreground: 210 24% 96%;
+    --card: 223 17% 12%;
+    --card-foreground: 210 24% 96%;
+    --popover: 223 17% 12%;
+    --popover-foreground: 210 24% 96%;
+    --primary: 5 92% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 14% 18%;
+    --secondary-foreground: 210 24% 96%;
+    --muted: 223 14% 16%;
+    --muted-foreground: 220 11% 67%;
+    --accent: 222 16% 20%;
+    --accent-foreground: 210 24% 96%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 24% 96%;
+    --border: 220 14% 24%;
+    --input: 220 14% 24%;
+    --ring: 5 92% 60%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 10% -10%, rgba(255, 76, 64, 0.24) 0%, transparent 44%),
+      radial-gradient(circle at 95% 0%, rgba(36, 211, 185, 0.18) 0%, transparent 38%),
+      linear-gradient(180deg, #0f1117 0%, #0b0d12 100%);
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 36px 36px;
+    mask-image: radial-gradient(circle at center, black 30%, transparent 100%);
+    opacity: 0.35;
+    z-index: -1;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display), var(--font-sans), sans-serif;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer components {
+  .container-main {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .market-canvas {
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255, 76, 64, 0.14), transparent 44%),
+      radial-gradient(circle at 85% 15%, rgba(36, 211, 185, 0.16), transparent 42%),
+      linear-gradient(180deg, #14161d 0%, #0f1117 100%);
+  }
+
+  .market-hero {
+    @apply border border-white/10;
+    background:
+      linear-gradient(130deg, rgba(255, 76, 64, 0.18), rgba(255, 76, 64, 0.04) 30%, rgba(19, 21, 29, 0.9) 70%),
+      radial-gradient(circle at 82% 22%, rgba(36, 211, 185, 0.25), transparent 45%),
+      rgba(18, 20, 28, 0.86);
+    box-shadow: 0 24px 54px rgba(0, 0, 0, 0.4);
+  }
+
+  .market-kpi {
+    @apply rounded-2xl border border-white/10 bg-white/5 p-4;
+  }
+
+  .feed-shell {
+    @apply rounded-2xl border border-white/10 bg-[#13161f]/85 backdrop-blur-xl;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .gradient-text {
+    background: linear-gradient(90deg, #ff5e55 0%, #22d3b5 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+::selection {
+  background: rgba(255, 76, 64, 0.34);
+  color: white;
+}
+
+:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
