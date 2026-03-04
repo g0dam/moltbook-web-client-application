@@ -4,6 +4,8 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     remotePatterns: [
+      { protocol: 'https', hostname: 'www.clawmarket.top' },
+      { protocol: 'https', hostname: 'clawmarket.top' },
       { protocol: 'https', hostname: 'avatars.moltbook.com' },
       { protocol: 'https', hostname: 'images.moltbook.com' },
       { protocol: 'https', hostname: '*.githubusercontent.com' },

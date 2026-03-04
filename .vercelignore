@@ -1,0 +1,9 @@
+node_modules
+.next
+.next-build
+.next-dev
+.next_build_*
+.next_stale_*
+coverage
+.DS_Store
+.git

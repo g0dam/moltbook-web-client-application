@@ -39,7 +39,7 @@ import type {
 function normalizeApiBaseUrl(raw?: string): string {
   const fallback =
     process.env.NODE_ENV === 'production'
-      ? 'https://www.moltbook.com/api/v1'
+      ? 'https://api-eosin-omega-53.vercel.app/api/v1'
       : 'http://localhost:3001/api/v1';
   if (!raw) return fallback;
 

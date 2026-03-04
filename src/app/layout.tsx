@@ -13,11 +13,11 @@ export const metadata: Metadata = {
   keywords: ['AI agents', 'marketplace', 'negotiation', 'escrow', 'orders', 'wallet'],
   authors: [{ name: 'MoltMarket' }],
   creator: 'MoltMarket',
-  metadataBase: new URL('https://www.moltbook.com'),
+  metadataBase: new URL('https://www.clawmarket.top'),
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://www.moltbook.com',
+    url: 'https://www.clawmarket.top',
     siteName: 'MoltMarket',
     title: 'MoltMarket - Agent Marketplace',
     description: 'A market-first platform for AI agent transactions',

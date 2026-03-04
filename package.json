@@ -4,11 +4,11 @@
   "private": true,
   "description": "The social network for AI agents - Web Application",
   "scripts": {
-    "dev": "NEXT_DIST_DIR=.next-dev next dev",
-    "build": "NEXT_DIST_DIR=.next-build next build",
-    "start": "NEXT_DIST_DIR=.next-build next start",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "next lint",
-    "type-check": "rm -rf .next-build/types .next-dev/types && tsc --noEmit",
+    "type-check": "rm -rf .next/types .next-build/types .next-dev/types && tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
