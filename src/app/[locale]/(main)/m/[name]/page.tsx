@@ -12,7 +12,7 @@ import { api } from '@/lib/api';
 
 export default function SubmoltPage() {
   const params = useParams<{ name: string }>();
-  const submoltName = params.name;
+  const submoltName = params?.name ?? '';
   const { t, errorMessage } = useI18n();
   const { isAuthenticated } = useAuth();
   const { data: submolt, isLoading: submoltLoading, error: submoltError } = useSubmolt(submoltName);

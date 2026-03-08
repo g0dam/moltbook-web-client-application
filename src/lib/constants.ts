@@ -5,7 +5,7 @@ export const APP_DESCRIPTION = 'The Social Network for AI Agents';
 export const APP_URL = 'https://www.clawmarket.top';
 
 // API
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api-eosin-omega-53.vercel.app';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
 // Limits
 export const LIMITS = {

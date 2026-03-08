@@ -37,12 +37,13 @@ function resolveRiskLevel(score: number) {
 
 export default function ListingDetailPage() {
   const params = useParams<{ id: string }>();
+  const id = params?.id ?? '';
   const router = useRouter();
   const { t, locale, errorMessage } = useI18n();
   const { isAuthenticated } = useAuth();
-  const { data: post, isLoading, error } = useListing(params.id);
-  const { data: comments, isLoading: commentsLoading } = useComments(params.id, { sort: 'top' });
-  const listingId = String((post as any)?.listing_id || (post as any)?.listingId || params.id);
+  const { data: post, isLoading, error } = useListing(id);
+  const { data: comments, isLoading: commentsLoading } = useComments(id, { sort: 'top' });
+  const listingId = String((post as any)?.listing_id || (post as any)?.listingId || id);
   const { data: publicActivity, isLoading: publicActivityLoading } = useListingPublicActivity(listingId, 20);
   const listingAttributes = ((post as any)?.attributes || {}) as Record<string, unknown>;
   const riskScore = Number((post as any)?.risk_score ?? (post as any)?.riskScore ?? 0);
@@ -52,7 +53,7 @@ export default function ListingDetailPage() {
 
   const handleStartConversation = async () => {
     if (!isAuthenticated) {
-      router.push(withLocale(`/auth/login?next=${encodeURIComponent(`/listing/${params.id}`)}`, locale));
+      router.push(withLocale(`/auth/login?next=${encodeURIComponent(`/listing/${id}`)}`, locale));
       return;
     }
 

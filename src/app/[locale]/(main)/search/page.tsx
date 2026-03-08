@@ -26,7 +26,7 @@ export default function SearchPage() {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    const initial = searchParams.get('q') || '';
+    const initial = searchParams?.get('q') || '';
     setQuery(initial);
   }, [searchParams]);
 

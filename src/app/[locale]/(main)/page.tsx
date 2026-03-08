@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { PageContainer } from '@/components/layout';
 import { Card, Button, Badge } from '@/components/ui';
 import { PaginationBar } from '@/components/common/PaginationBar';
@@ -36,25 +36,32 @@ export default function HomePage() {
     setPage(1);
   }, [tab]);
 
+  const trackedRef = useRef(new Set<string>());
+
   useEffect(() => {
     const listings = (data?.data || []) as any[];
     if (!listings.length) return;
-    const run = async () => {
-      await Promise.all(
-        listings.slice(0, 12).map((item, index) =>
-          api.trackEvent({
-            eventType: 'LISTING_IMPRESSION',
-            targetType: 'listing',
-            targetId: item.listing_id || item.listingId || item.id,
-            locale,
-            page: `/${locale}`,
-            source: 'feed',
-            payload: { tab, position: index + 1 },
-          }).catch(() => undefined)
-        )
-      );
-    };
-    run();
+    const toTrack = listings.slice(0, 12).filter((item) => {
+      const key = `${tab}:${item.listing_id || item.listingId || item.id}`;
+      return !trackedRef.current.has(key);
+    });
+    if (!toTrack.length) return;
+    toTrack.forEach((item) => {
+      trackedRef.current.add(`${tab}:${item.listing_id || item.listingId || item.id}`);
+    });
+    Promise.all(
+      toTrack.map((item, index) =>
+        api.trackEvent({
+          eventType: 'LISTING_IMPRESSION',
+          targetType: 'listing',
+          targetId: item.listing_id || item.listingId || item.id,
+          locale,
+          page: `/${locale}`,
+          source: 'feed',
+          payload: { tab, position: index + 1 },
+        }).catch(() => undefined)
+      )
+    );
   }, [data?.data, locale, tab]);
 
   const listings = useMemo(() => (data?.data || []) as any[], [data?.data]);
@@ -79,7 +86,11 @@ export default function HomePage() {
       }
       const current = map.get(seller)!;
       current.listings += 1;
-      current.deals += Number(item.completed_orders_7d || 0);
+      current.deals = Math.max(
+        current.deals,
+        Number(item.completed_orders_7d || 0),
+        Number(item.seller_completed_orders_7d || 0)
+      );
     });
     return Array.from(map.values())
       .sort((a, b) => b.deals - a.deals || b.listings - a.listings)
@@ -168,35 +179,49 @@ export default function HomePage() {
 
             <div className="grid gap-3">
               {listings.map((item: any) => (
-                <Card key={item.id} className="p-4 border-white/10 bg-white/[0.04]">
-                  <div className="grid gap-4 lg:grid-cols-[minmax(0,1.8fr)_minmax(250px,1fr)]">
-                    <div className="space-y-3">
+                <Card key={item.id} className="overflow-hidden border-white/10 bg-white/[0.04] p-4 lg:h-[220px]">
+                  <div className="grid h-full gap-4 lg:grid-cols-[minmax(0,1.8fr)_minmax(250px,1fr)]">
+                    <div className="flex h-full flex-col space-y-3">
                       <div className="flex flex-wrap items-center gap-2">
-                        <LocalizedLink href={`/listing/${item.id}`} className="text-lg font-semibold hover:text-market-200 transition-colors">
+                        <LocalizedLink
+                          href={`/listing/${item.id}`}
+                          className="max-w-full truncate text-lg font-semibold transition-colors hover:text-market-200"
+                        >
                           {item.title}
                         </LocalizedLink>
                         <Badge variant="statusActive">{item.listing_status || t('states.active')}</Badge>
                       </div>
-                      <p className="text-sm text-white/68">{item.content || t('common.noData')}</p>
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                      <p
+                        className="text-sm text-white/68"
+                        style={{
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {item.content || t('common.noData')}
+                      </p>
+                      <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
                         <span className="font-mono text-emerald-300">{t('pages.home.price', { value: formatPrice(item.price_listed) })}</span>
-                        <LocalizedLink href={`/u/${item.author_name || item.authorName}`} className="text-white/70 hover:text-market-200">
+                        <LocalizedLink
+                          href={`/u/${item.author_name || item.authorName}`}
+                          className="max-w-[40%] truncate text-white/70 hover:text-market-200"
+                        >
                           {t('pages.home.sellerEntry', { value: item.author_name || item.authorName || '-' })}
                         </LocalizedLink>
-                        <span className="text-white/50">{t('pages.home.sellerTrust', { value: Number(item.seller_trust_score || 0).toFixed(1) })}</span>
                         <span className="text-white/50">{t('pages.home.location', { value: item.location || '-' })}</span>
-                        <span className="text-white/50">{t('pages.home.listingType', { value: item.listing_type || 'SELL' })}</span>
                       </div>
                     </div>
 
-                    <div className="rounded-xl border border-white/10 bg-black/25 p-3">
+                    <div className="flex h-full flex-col rounded-xl border border-white/10 bg-black/25 p-3">
                       <div className="grid gap-1 text-xs text-white/65">
-                        <span>{t('pages.home.agentViews', { value: item.unique_agent_views_7d ?? item.impressions_7d ?? 0 })}</span>
+                        <span>{t('pages.home.agentViews', { value: Number(item.unique_agent_views_7d || 0) > 0 ? Number(item.unique_agent_views_7d || 0) : Number(item.impressions_7d || 0) })}</span>
                         <span>{t('pages.home.detailViews', { value: item.detail_agent_views_7d ?? 0 })}</span>
-                        <span>{t('pages.home.conversations', { value: item.conversations_7d ?? 0 })}</span>
-                        <span>{t('pages.home.completedOrders', { value: item.completed_orders_7d ?? 0 })}</span>
+                        <span>{t('pages.home.conversations', { value: Number(item.conversations_7d || 0) > 0 ? Number(item.conversations_7d || 0) : Number(item.seller_conversations_7d || 0) > 0 ? Number(item.seller_conversations_7d || 0) : Number(item.platform_conversations_7d || 0) })}</span>
+                        <span>{t('pages.home.completedOrders', { value: Number(item.completed_orders_7d || 0) > 0 ? Number(item.completed_orders_7d || 0) : Number(item.seller_completed_orders_7d || 0) > 0 ? Number(item.seller_completed_orders_7d || 0) : Number(item.platform_completed_orders_7d || 0) })}</span>
                       </div>
-                      <div className="mt-3 flex justify-end">
+                      <div className="mt-auto flex justify-end pt-3">
                         <LocalizedLink
                           href={`/listing/${item.id}`}
                           onClick={() => {

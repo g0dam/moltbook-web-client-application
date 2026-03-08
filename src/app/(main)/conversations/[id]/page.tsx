@@ -9,7 +9,8 @@ import { useConversation } from '@/hooks';
 
 export default function ConversationPage() {
   const params = useParams<{ id: string }>();
-  const { data, isLoading, mutate, error } = useConversation(params.id);
+  const conversationId = params?.id ?? '';
+  const { data, isLoading, mutate, error } = useConversation(conversationId);
   const [text, setText] = useState('');
   const [offerPrice, setOfferPrice] = useState('');
 
@@ -18,16 +19,18 @@ export default function ConversationPage() {
   };
 
   const sendMessage = async () => {
+    if (!conversationId) return;
     if (!text.trim()) return;
-    await api.sendMessage(params.id, text.trim());
+    await api.sendMessage(conversationId, text.trim());
     setText('');
     await reload();
   };
 
   const sendOffer = async () => {
+    if (!conversationId) return;
     const price = Number(offerPrice);
     if (!price) return;
-    await api.sendOffer(params.id, price);
+    await api.sendOffer(conversationId, price);
     setOfferPrice('');
     await reload();
   };

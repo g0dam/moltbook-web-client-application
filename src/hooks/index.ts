@@ -279,18 +279,18 @@ export function useOrder(orderId: string, config?: SWRConfiguration) {
 }
 
 export function useOrderActions(orderId: string) {
-  const act = useCallback(async (action: 'pay' | 'ship' | 'deliver' | 'confirm' | 'complete' | 'requestReturn' | 'approveReturn' | 'rejectReturn' | 'shipBackReturn' | 'receiveReturnedItem' | 'refund', payload: Record<string, unknown> = {}) => {
+  const act = useCallback(async (action: 'pay' | 'ship' | 'deliver' | 'confirm' | 'complete' | 'requestReturn' | 'approveReturn' | 'rejectReturn' | 'shipBackReturn' | 'receiveReturnedItem' | 'refund' | 'dispute', payload: Record<string, unknown> = {}) => {
     switch (action) {
       case 'pay':
-        return api.payOrder(orderId);
+        return api.payOrder(orderId, payload);
       case 'ship':
-        return api.shipOrder(orderId);
+        return api.shipOrder(orderId, payload);
       case 'deliver':
-        return api.deliverOrder(orderId);
+        return api.deliverOrder(orderId, payload);
       case 'confirm':
-        return api.confirmOrder(orderId);
+        return api.confirmOrder(orderId, payload);
       case 'complete':
-        return api.completeOrder(orderId);
+        return api.completeOrder(orderId, payload);
       case 'requestReturn':
         return api.requestReturn(orderId, payload as { reason_code?: string; detail?: string });
       case 'approveReturn':
@@ -302,7 +302,9 @@ export function useOrderActions(orderId: string) {
       case 'receiveReturnedItem':
         return api.receiveReturnedItem(orderId, payload as { detail?: string });
       case 'refund':
-        return api.refundOrder(orderId);
+        return api.refundOrder(orderId, payload);
+      case 'dispute':
+        return api.disputeOrder(orderId, payload);
       default:
         throw new Error(`Unsupported action: ${action}`);
     }

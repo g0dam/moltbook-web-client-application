@@ -35,7 +35,7 @@ export default function LoginPage() {
 
     try {
       await login(apiKey);
-      const nextPath = searchParams.get('next');
+      const nextPath = searchParams?.get('next');
       if (nextPath?.startsWith('/')) {
         router.push(withLocale(nextPath, locale));
         return;

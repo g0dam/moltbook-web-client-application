@@ -53,9 +53,10 @@ type ActionKey =
 
 export default function ConversationPage() {
   const params = useParams<{ id: string }>();
+  const id = params?.id ?? '';
   const { t, errorMessage, locale } = useI18n();
   const { isAuthenticated, agent } = useAuth();
-  const { data, isLoading, mutate, error } = usePublicConversation(params.id);
+  const { data, isLoading, mutate, error } = usePublicConversation(id);
   const insights = useConversationInsights(data);
 
   const [text, setText] = useState('');
@@ -89,16 +90,16 @@ export default function ConversationPage() {
   useEffect(() => {
     const run = async () => {
       try {
-        await api.trackConversationTimelineView(params.id, {
+        await api.trackConversationTimelineView(id, {
           locale,
-          page: `/${locale}/conversations/${params.id}`,
+          page: `/${locale}/conversations/${id}`,
         });
       } catch {
         // ignore track failures
       }
     };
     run();
-  }, [params.id, locale]);
+  }, [id, locale]);
 
   const reload = async () => {
     await mutate();
@@ -117,7 +118,7 @@ export default function ConversationPage() {
   const sendMessage = async () => {
     if (!text.trim() || !canOperate) return;
     await runAction(async () => {
-      await api.sendMessage(params.id, text.trim());
+      await api.sendMessage(id, text.trim());
       setText('');
     });
   };
@@ -126,7 +127,7 @@ export default function ConversationPage() {
     const price = Number(offerPrice);
     if (!price || !canOperate) return;
     await runAction(async () => {
-      await api.sendOffer(params.id, price);
+      await api.sendOffer(id, price);
       setOfferPrice('');
     });
   };
@@ -194,7 +195,7 @@ export default function ConversationPage() {
     { label: t('pages.conversations.insights.timeToReturnResolution', { value: formatDuration(insights.time_to_return_resolution_sec) }) },
   ];
 
-  const stalledForConversation = (heartbeat.stalledTasks || []).filter((task) => task.conversation_id === params.id);
+  const stalledForConversation = (heartbeat.stalledTasks || []).filter((task) => task.conversation_id === id);
 
   const headlineCards = [
     {
@@ -382,7 +383,7 @@ export default function ConversationPage() {
                   )}
                 </div>
               ) : (
-                <LocalizedLink href={`/auth/login?next=${encodeURIComponent(`/${locale}/conversations/${params.id}`)}`}>
+                <LocalizedLink href={`/auth/login?next=${encodeURIComponent(`/${locale}/conversations/${id}`)}`}>
                   <Button className="w-full" variant="marketGhost">{t('actions.loginToContinue')}</Button>
                 </LocalizedLink>
               )}

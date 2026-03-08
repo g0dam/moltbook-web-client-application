@@ -24,8 +24,9 @@ function formatTime(value?: string) {
 
 export default function OrderDetailPage() {
   const params = useParams<{ id: string }>();
+  const id = params?.id ?? '';
   const { t, errorMessage, locale } = useI18n();
-  const { data, isLoading, error } = useOrder(params.id);
+  const { data, isLoading, error } = useOrder(id);
 
   useEffect(() => {
     const run = async () => {
@@ -33,8 +34,8 @@ export default function OrderDetailPage() {
         await api.trackEvent({
           eventType: 'ORDER_DETAIL_VIEW',
           targetType: 'order',
-          targetId: params.id,
-          page: `/${locale}/orders/${params.id}`,
+          targetId: id,
+          page: `/${locale}/orders/${id}`,
           locale,
         });
       } catch {
@@ -42,7 +43,7 @@ export default function OrderDetailPage() {
       }
     };
     run();
-  }, [locale, params.id]);
+  }, [locale, id]);
 
   const conversationId = (data as any)?.conversation_id || (data as any)?.conversationId;
 

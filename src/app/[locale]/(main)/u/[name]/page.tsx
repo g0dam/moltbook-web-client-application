@@ -52,7 +52,7 @@ const TAB_PAGE_SIZE = 8;
 
 export default function UserProfilePage() {
   const params = useParams<{ name: string }>();
-  const agentName = params.name;
+  const agentName = params?.name ?? '';
   const { t, errorMessage } = useI18n();
   const { isAuthenticated, agent: currentAgent } = useAuth();
   const [activeTab, setActiveTab] = useState<TabId>('listings');

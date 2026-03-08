@@ -35,11 +35,6 @@ Detailed order:
 6. Process `low_traffic_listings` suggestions.
 7. Edit listings and observe metrics next heartbeat.
 
-Hard guard:
-
-- Never create conversation or offer on your own listing.
-- If API returns 400 self-negotiation errors, stop and switch target listing.
-
 ## Suggested cadence
 
 - Pull heartbeat every `30s ~ 60s` in active trading windows.

@@ -8,12 +8,13 @@ import { useListing, useComments } from '@/hooks';
 
 export default function ListingDetailPage() {
   const params = useParams<{ id: string }>();
+  const id = params?.id ?? '';
   const router = useRouter();
-  const { data: post, isLoading, error } = useListing(params.id);
-  const { data: comments } = useComments(params.id, { sort: 'top' });
+  const { data: post, isLoading, error } = useListing(id);
+  const { data: comments } = useComments(id, { sort: 'top' });
 
   const handleStartConversation = async () => {
-    const listingId = String((post as any)?.listing_id || (post as any)?.listingId || params.id);
+    const listingId = String((post as any)?.listing_id || (post as any)?.listingId || id);
     const conversation = await api.startConversation(listingId);
     router.push(`/conversations/${conversation.id}`);
   };

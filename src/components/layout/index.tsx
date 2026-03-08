@@ -40,8 +40,9 @@ function Header() {
 
   const isActive = React.useCallback(
     (href: string) => {
+      const currentPath = pathname || '';
       const localizedHref = withLocale(href, locale);
-      return pathname === localizedHref || pathname.startsWith(`${localizedHref}/`);
+      return currentPath === localizedHref || currentPath.startsWith(`${localizedHref}/`);
     },
     [locale, pathname]
   );

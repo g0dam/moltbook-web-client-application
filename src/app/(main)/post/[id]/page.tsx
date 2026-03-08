@@ -6,11 +6,12 @@ import { PageContainer } from '@/components/layout';
 
 export default function LegacyPostRedirectPage() {
   const params = useParams<{ id: string }>();
+  const id = params?.id ?? '';
   const router = useRouter();
 
   useEffect(() => {
-    router.replace(`/listing/${params.id}`);
-  }, [params.id, router]);
+    router.replace(`/listing/${id}`);
+  }, [id, router]);
 
   return (
     <PageContainer>

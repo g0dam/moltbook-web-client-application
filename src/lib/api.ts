@@ -37,11 +37,13 @@ import type {
 } from '@/types';
 
 function normalizeApiBaseUrl(raw?: string): string {
-  const fallback =
-    process.env.NODE_ENV === 'production'
-      ? 'https://api-eosin-omega-53.vercel.app/api/v1'
-      : 'http://localhost:3001/api/v1';
-  if (!raw) return fallback;
+  if (!raw) {
+    if (typeof window !== 'undefined') {
+      return '/api/v1';
+    }
+    const port = process.env.PORT || '3000';
+    return `http://localhost:${port}/api/v1`;
+  }
 
   try {
     const url = new URL(raw);
@@ -57,16 +59,51 @@ function normalizeApiBaseUrl(raw?: string): string {
 
     return url.toString().replace(/\/+$/, '');
   } catch {
-    return fallback;
+    if (raw.startsWith('/')) {
+      return raw.replace(/\/+$/, '');
+    }
+    if (typeof window !== 'undefined') {
+      return '/api/v1';
+    }
+    const port = process.env.PORT || '3000';
+    return `http://localhost:${port}/api/v1`;
   }
 }
 
-const API_BASE_URL = normalizeApiBaseUrl(process.env.NEXT_PUBLIC_API_URL);
+const API_BASE_URL = normalizeApiBaseUrl(process.env.NEXT_PUBLIC_API_URL || process.env.MOLTBOOK_API_URL);
 
-function buildRequestUrl(path: string): URL {
-  const normalizedBase = API_BASE_URL.endsWith('/') ? API_BASE_URL : `${API_BASE_URL}/`;
+function buildRequestUrl(path: string, query?: Record<string, string | number | boolean | undefined>): string {
   const normalizedPath = path.replace(/^\/+/, '');
-  return new URL(normalizedPath, normalizedBase);
+  const isAbsoluteBase = /^https?:\/\//i.test(API_BASE_URL);
+
+  if (isAbsoluteBase) {
+    const normalizedBase = API_BASE_URL.endsWith('/') ? API_BASE_URL : `${API_BASE_URL}/`;
+    const url = new URL(normalizedPath, normalizedBase);
+    if (query) {
+      Object.entries(query).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          url.searchParams.append(key, String(value));
+        }
+      });
+    }
+    return url.toString();
+  }
+
+  const base = API_BASE_URL.replace(/\/+$/, '');
+  const prefix = base.startsWith('/') ? base : `/${base}`;
+  if (!query) {
+    return `${prefix}/${normalizedPath}`;
+  }
+
+  const params = new URLSearchParams();
+  Object.entries(query).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      params.append(key, String(value));
+    }
+  });
+
+  const qs = params.toString();
+  return qs ? `${prefix}/${normalizedPath}?${qs}` : `${prefix}/${normalizedPath}`;
 }
 
 type RequestOptions = {
@@ -129,15 +166,7 @@ class ApiClient {
   }
 
   private async request<T>(method: string, path: string, body?: unknown, options: RequestOptions = {}): Promise<T> {
-    const url = buildRequestUrl(path);
-
-    if (options.query) {
-      Object.entries(options.query).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          url.searchParams.append(key, String(value));
-        }
-      });
-    }
+    const url = buildRequestUrl(path, options.query);
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -147,7 +176,7 @@ class ApiClient {
     const apiKey = this.getApiKey();
     if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
 
-    const response = await fetch(url.toString(), {
+    const response = await fetch(url, {
       method,
       headers,
       body: body ? JSON.stringify(body) : undefined,

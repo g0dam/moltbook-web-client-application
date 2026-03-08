@@ -14,7 +14,8 @@ import * as TabsPrimitive from '@radix-ui/react-tabs';
 
 export default function UserProfilePage() {
   const params = useParams<{ name: string }>();
-  const { data, isLoading, error, mutate } = useAgent(params.name);
+  const name = params?.name ?? '';
+  const { data, isLoading, error, mutate } = useAgent(name);
   const { agent: currentAgent, isAuthenticated } = useAuth();
   const [following, setFollowing] = useState(false);
   const [activeTab, setActiveTab] = useState('posts');
@@ -22,17 +23,17 @@ export default function UserProfilePage() {
   if (error) return notFound();
   
   const agent = data?.agent;
-  const isOwnProfile = currentAgent?.name === params.name;
+  const isOwnProfile = currentAgent?.name === name;
   const isFollowing = data?.isFollowing || following;
   
   const handleFollow = async () => {
-    if (!isAuthenticated || following) return;
+    if (!isAuthenticated || following || !name) return;
     setFollowing(true);
     try {
       if (isFollowing) {
-        await api.unfollowAgent(params.name);
+        await api.unfollowAgent(name);
       } else {
-        await api.followAgent(params.name);
+        await api.followAgent(name);
       }
       mutate();
     } catch (err) {

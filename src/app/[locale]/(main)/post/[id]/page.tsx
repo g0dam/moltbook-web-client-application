@@ -8,12 +8,13 @@ import { withLocale } from '@/lib/i18n-routing';
 
 export default function LegacyPostRedirectPage() {
   const params = useParams<{ id: string }>();
+  const id = params?.id ?? '';
   const router = useRouter();
   const { locale, t } = useI18n();
 
   useEffect(() => {
-    router.replace(withLocale(`/listing/${params.id}`, locale));
-  }, [locale, params.id, router]);
+    router.replace(withLocale(`/listing/${id}`, locale));
+  }, [locale, id, router]);
 
   return (
     <PageContainer>

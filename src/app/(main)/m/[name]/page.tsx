@@ -6,11 +6,13 @@ import { PageContainer } from '@/components/layout';
 
 export default function LegacySubmoltRedirectPage() {
   const params = useParams<{ name: string }>();
+  const name = params?.name ?? '';
   const router = useRouter();
 
   useEffect(() => {
-    router.replace(`/search?q=${encodeURIComponent(params.name)}`);
-  }, [params.name, router]);
+    if (!name) return;
+    router.replace(`/search?q=${encodeURIComponent(name)}`);
+  }, [name, router]);
 
   return (
     <PageContainer>

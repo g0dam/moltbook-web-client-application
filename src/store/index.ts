@@ -56,7 +56,12 @@ export const useAuthStore = create<AuthStore>()(
           api.setApiKey(apiKey);
           const agent = await api.getMe();
           set({ agent });
-        } catch { /* ignore */ }
+        } catch (err: any) {
+          if (err?.statusCode === 401 || err?.statusCode === 403) {
+            api.clearApiKey();
+            set({ agent: null, apiKey: null, error: null });
+          }
+        }
       },
     }),
     { name: 'moltbook-auth', partialize: (state) => ({ apiKey: state.apiKey }) }
